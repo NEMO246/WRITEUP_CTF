@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Puzzle - Your Creative Writing Hub</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Puzzle</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/home">Home</a>
+                <a class="nav-link" href="/publish">Publish</a>
+                <a class="nav-link active" href="/collaborations">Collaborations</a>
+                <a class="nav-link" href="/profile">Profile</a>
+                <a class="nav-link" href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <!-- Incoming Requests -->
+        <h2 class="mb-4">Incoming Collaboration Requests</h2>
+        {% if incoming_requests %}
+            <div class="row">
+                {% for request in incoming_requests %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ request.title }}</h5>
+                                <p class="card-text">{{ request.content[:200] }}{% if request.content|length > 200 %}...{% endif %}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Requested by {{ request.requester_name }}</small>
+                                    <div>
+                                        <span class="d-none">{{ request.uuid }}</span>
+                                        <button class="btn btn-success btn-sm" onclick="acceptCollaboration('{{ request.uuid }}')">Accept</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No pending incoming collaboration requests.
+            </div>
+        {% endif %}
+
+        <!-- Outgoing Requests -->
+        <h2 class="mb-4 mt-5">Outgoing Collaboration Requests</h2>
+        {% if outgoing_requests %}
+            <div class="row">
+                {% for request in outgoing_requests %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ request.title }}</h5>
+                                <p class="card-text">{{ request.content[:200] }}{% if request.content|length > 200 %}...{% endif %}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Sent to {{ request.recipient_name }}</small>
+                                    <div>
+                                        <span class="d-none">{{ request.uuid }}</span>
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No pending outgoing collaboration requests.
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+    async function acceptCollaboration(uuid) {
+        try {
+            const response = await fetch(`/collab/accept/${uuid}`, {
+                method: 'POST'
+            });
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                alert(data.error || 'Failed to accept collaboration');
+            }
+        } catch (err) {
+            alert('Error accepting collaboration');
+        }
+    }
+    </script>
+</body>
+</html>

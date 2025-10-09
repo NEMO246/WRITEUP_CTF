@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Puzzle - Your Creative Writing Hub</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Puzzle</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link active" href="/admin">Admin</a>
+                <a class="nav-link" href="/profile">Profile</a>
+                <a class="nav-link" href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Admin Panel</h1>
+        
+        <!-- Ban User Form -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Ban User</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/admin/ban_user">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Ban User</button>
+                </form>
+                {% if ban_message %}
+                    <div class="alert alert-info mt-3">
+                        {{ ban_message | safe }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- User Statistics -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>User Statistics</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h5>Total Users</h5>
+                        <p>{{ user_stats.total_users }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>Admins</h5>
+                        <p>{{ user_stats.admin_count }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>Editors</h5>
+                        <p>{{ user_stats.editor_count }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>Regular Users</h5>
+                        <p>{{ user_stats.user_count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Article Statistics -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Article Statistics</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Total Articles</h5>
+                        <p>{{ article_stats.total_articles }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Unique Authors</h5>
+                        <p>{{ article_stats.unique_authors }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Unique Collaborators</h5>
+                        <p>{{ article_stats.unique_collaborators }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collaboration Statistics -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Collaboration Statistics</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Total Requests</h5>
+                        <p>{{ collab_stats.total_requests }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Pending Requests</h5>
+                        <p>{{ collab_stats.pending_requests }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Accepted Requests</h5>
+                        <p>{{ collab_stats.accepted_requests }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Articles -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Recent Articles</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for article in recent_articles %}
+                        <tr>
+                            <td>{{ article.title }}</td>
+                            <td>{{ article.author_name }}</td>
+                            <td>{{ article.created_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
