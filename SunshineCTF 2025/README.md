@@ -1,6 +1,6 @@
 # Personal results SunshineCTF 2025 
 
-![Results Title1](resul1.png)
+![Results Title1](result1.png)
 
 
-![Results Title2](resul2.png)
+![Results Title2](result2.png)
