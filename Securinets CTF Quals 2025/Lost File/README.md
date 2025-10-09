@@ -150,8 +150,6 @@ Here is what happens just before the call to `_snprintf` at `.text:00401D91`:
 -   **Hash Calculation:** The result of `_snprintf` (stored in `[ebp+pbData]`) is passed to the `_sha256_buf` function, which computes its **SHA-256** hash.
 -   **Key and IV Usage:** The resulting 32-byte hash is passed to the `_aes256_encrypt_simple` function, which uses it as both the encryption key and the source for the Initialization Vector (IV). Analysis of `_aes256_encrypt_simple` shows that it uses `CryptSetKeyParam` with the `KP_IV` parameter (`dwParam=1`) to set the first 16 bytes of the hash as the IV.
 
-## Overall Conclusion from Reverse Engineering
-
 The encryption algorithm is fully revealed:
 1.  **Key Source:** The string `<argument>|<computer_name>|<secret_part.txt_content>`.
 2.  **AES Key:** The SHA-256 hash of this string.
