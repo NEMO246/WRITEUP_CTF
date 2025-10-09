@@ -44,35 +44,121 @@ The output, `C:\Documents and Settings\RagdollFan2005\Desktop\secret_part.txt`, 
 
 ## Step 2: Reverse Engineering `locker_sim.exe`
 
-To understand how the encryption key is generated, we analyze the `locker_sim.exe` executable in a disassembler (like IDA). An analysis of the `_main` function reveals the entire key generation algorithm.
+To understand how the program generates the encryption key and what it needs to do so, we perform a static analysis of the `locker_sim.exe` executable using a disassembler (like IDA Pro). The core logic is concentrated in the `_main` function, which starts at address `.text:00401A7A`.
 
-**Key Findings from the Code:**
-1.  **Source String Generation:** The program constructs a single long string from three parts, joined by a `|` delimiter:
-    *   An argument passed via the command line.
-    *   The computer name, read from the registry.
-    *   The content of the `secret_part.txt` file.
-    *   String format: `<arg>|<computer_name>|<secret_part_content>`
+The analysis of this function shows that the program sequentially gathers three pieces of data, combines them, and then uses the result to create the encryption key.
 
-2.  **Key and IV Generation:**
-    *   A **SHA-256** hash is computed from the resulting string.
-    *   **AES Key:** The entire 32-byte SHA-256 hash.
-    *   **Initialization Vector (IV):** The first 16 bytes of the same hash.
+### 2.1. Obtaining the Command Line Argument (`<arg>`)
 
-3.  **Encryption:** The file `to_encrypt.txt` is encrypted using the **AES-256** algorithm in **CBC** mode.
+At the very beginning of its execution, the program accesses the arguments it was launched with.
 
 ```assembly
-; The program assembles three pieces of data into one string
-.text:00401D7C                 mov     dword ptr [esp+8], offset aSSS ; "%s|%s|%s"
+.text:00401A97                 cmp     dword ptr [ebx], 1 ; Checks if arguments exist (argc > 1)
+.text:00401A9A                 jg      short loc_401AA6   ; If yes, proceeds to handle them
+
+.text:00401AA6 loc_401AA6:
+.text:00401AA6                 mov     eax, [ebx+4]    ; Loads a pointer to the argv array into EAX
+.text:00401AA9                 mov     eax, [eax+4]    ; Loads a pointer to argv[1] (the first argument) into EAX
+.text:00401AAC                 mov     [ebp+var_24], eax ; Stores the pointer to <arg> in the local variable var_24
+```
+**Code Explanation:**
+- The program checks the argument count (`argc`). If no arguments are provided, it terminates.
+- `mov eax, [eax+4]` loads the address of the second element in the `argv` array (i.e., `argv[1]`), as `argv[0]` is always the program name itself.
+- This pointer to the argument string is saved on the stack in the `var_24` variable for later use.
+
+**Conclusion:** The first key component is the **argument passed to the program at launch**.
+
+### 2.2. Obtaining the Computer Name (`<computer_name>`)
+
+Next, the program prepares a buffer on the stack and calls a function to read the computer name from the registry.
+
+```assembly
+; Prepares the 'Destination' buffer on the stack to store the result
+.text:00401AAF                 lea     edx, [ebp+Destination]
+; ... code to clear the buffer ...
+.text:00401ACB                 lea     eax, [ebp+Destination]
+.text:00401AD1                 mov     [esp], eax      ; Passes the buffer pointer as an argument
+.text:00401AD4                 call    _read_computername_from_registry ; Calls the function
+```**Code Explanation:**
+- The `_read_computername_from_registry` function (address `.text:00401460`) queries the Windows registry at the path `SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName` and reads its value.
+- The result (the computer name) is written into the `Destination` buffer, whose address was passed to the function.
+
+**Conclusion:** The second key component is the **name of the computer** where the program is executed.
+
+### 2.3. Obtaining the Content of `secret_part.txt` (`<secret_part_content>`)
+
+The next step is to find the file `secret_part.txt` in its directory, read its content, and then delete it.
+
+```assembly
+; Forms the path to the secret_part.txt file
+.text:00401C8E                 mov     dword ptr [esp+8], offset Format ; "%ssecret_part.txt"
+.text:00401CA7                 call    _snprintf
+
+; Reads the file's content into memory
+.text:00401CFE                 lea     eax, [ebp+Buffer] ; Pointer to the file path
+.text:00401D04                 mov     [esp], eax      ; FileName
+.text:00401D07                 call    _read_file_to_buffer
+
+; Deletes the file immediately after reading
+.text:00401D12                 mov     [esp], eax      ; lpFileName
+.text:00401D15                 call    _DeleteFileA@4  ; DeleteFileA(x)
+```
+**Code Explanation:**
+- The `_read_file_to_buffer` function allocates memory for the file's content and returns a pointer to this buffer. This pointer is stored in the `[ebp+Block]` variable.
+- The call to `_DeleteFileA@4` right after reading explains why we found this file in the Recycle Bin.
+
+**Conclusion:** The third key component is the **content of the `secret_part.txt` file**.
+
+### 2.4. The Crucial Step: Assembling the Final String
+
+This is the most critical part of the analysis. The program uses `_snprintf` to combine all three strings into one, using `|` as a separator. In assembly, arguments for a function are pushed onto the stack in reverse order (right to left).
+
+Here is what happens just before the call to `_snprintf` at `.text:00401D91`:
+
+```assembly
+; Prepare the third argument for "%s|%s|%s" (the rightmost %s)
+.text:00401D67                 mov     eax, [ebp+Block]  ; Load pointer to secret_part.txt content
+.text:00401D6B                 mov     [esp+14h], eax  ; Push it onto the stack
+
+; Prepare the second argument (the middle %s)
+.text:00401D71                 lea     eax, [ebp+Destination] ; Load address of the buffer with the computer name
+.text:00401D75                 mov     [esp+10h], eax  ; Push it onto the stack
+
+; Prepare the first argument (the leftmost %s)
+.text:00401D78                 mov     eax, [ebp+var_24] ; Load pointer to the command line argument
+.text:00401D7C                 mov     [esp+0Ch], eax  ; Push it onto the stack
+
+; Pass the format string
+.text:00401D84                 mov     dword ptr [esp+8], offset aSSS ; "%s|%s|%s"
+
+; Pass the buffer for the final result
 .text:00401D8B                 mov     eax, [ebp+pbData]
 .text:00401D8E                 mov     [esp], eax      ; Buffer
+
+; Call the function
 .text:00401D91                 call    _snprintf
-
-; Then, a SHA-256 hash is calculated from this string
-.text:00401DE4                 call    _sha256_buf
-
-; The hash is used as the key for AES-256 encryption
-.text:00401F98                 call    _aes256_encrypt_simple
 ```
+**Code Explanation:**
+1.  The **third `%s`** receives `[ebp+Block]` (**secret_part_content**).
+2.  The **second `%s`** receives the address of the `[ebp+Destination]` buffer (**computer_name**).
+3.  The **first `%s`** receives `[ebp+var_24]` (**arg**).
+
+**Conclusion:** The assembly code unequivocally proves that the string is assembled in the format: **`<arg>|<computer_name>|<secret_part_content>`**.
+
+### 2.5. Key Generation and Encryption
+
+-   **Hash Calculation:** The result of `_snprintf` (stored in `[ebp+pbData]`) is passed to the `_sha256_buf` function, which computes its **SHA-256** hash.
+-   **Key and IV Usage:** The resulting 32-byte hash is passed to the `_aes256_encrypt_simple` function, which uses it as both the encryption key and the source for the Initialization Vector (IV). Analysis of `_aes256_encrypt_simple` shows that it uses `CryptSetKeyParam` with the `KP_IV` parameter (`dwParam=1`) to set the first 16 bytes of the hash as the IV.
+
+## Overall Conclusion from Reverse Engineering
+
+The encryption algorithm is fully revealed:
+1.  **Key Source:** The string `<argument>|<computer_name>|<secret_part.txt_content>`.
+2.  **AES Key:** The SHA-256 hash of this string.
+3.  **IV:** The first 16 bytes of the SHA-256 hash.
+4.  **Algorithm:** AES-256 in CBC mode.
+
+Now we know exactly what to look for in memory to recover the key.
 
 ## Step 3: Memory Forensics
 
@@ -84,7 +170,7 @@ We use the `envars` plugin to inspect the environment variables.
 ```bash
 ./volatility -f mem.vmem --profile=WinXPSP3x86 envars
 ```
-In the output, we find the `COMPUTERNAME` variable:
+In the output, we find the `USERDOMAIN` variable:
 
 ![Finding the Computer Name](images/4.jpg)
 
