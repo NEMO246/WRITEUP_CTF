@@ -79,7 +79,8 @@ Next, the program prepares a buffer on the stack and calls a function to read th
 .text:00401ACB                 lea     eax, [ebp+Destination]
 .text:00401AD1                 mov     [esp], eax      ; Passes the buffer pointer as an argument
 .text:00401AD4                 call    _read_computername_from_registry ; Calls the function
-```**Code Explanation:**
+```
+**Code Explanation:**
 - The `_read_computername_from_registry` function (address `.text:00401460`) queries the Windows registry at the path `SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName` and reads its value.
 - The result (the computer name) is written into the `Destination` buffer, whose address was passed to the function.
 
