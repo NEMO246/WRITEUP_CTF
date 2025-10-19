@@ -56,7 +56,7 @@ The chronological difference required calculating the number of days between two
 
 
 
-![Title](images/3.jpg)
+![Title](images/3.png)
 
 ### Step 7: What Chrome browser version does the malware impersonate in its User-Agent string?
 
