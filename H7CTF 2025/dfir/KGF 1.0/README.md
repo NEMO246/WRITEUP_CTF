@@ -4,7 +4,7 @@
 
 ### Solution
 
-![Title](images/1.jpg)
+![Title](images/1.png)
 
 ### Step 1: What is the IP address of the primary C2 server?
 
@@ -22,7 +22,7 @@ To fully document the vector of compromise, the entire URL used to download the 
 
 
 
-![Title](images/2.jpg)
+![Title](images/2.png)
 
 ### Step 3: How many backup C2 IP addresses are embedded in the kinsing binary (excluding the primary)?
 
