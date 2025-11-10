@@ -1,6 +1,6 @@
 ## BuckeyeCTF 2025 - zip2john2zip Write-up
 
-![Title](Title.png)
+![Title](images/Title.png)
 
 ### Step 1: Challenge Description and Initial Analysis
 
@@ -38,7 +38,7 @@ Session completed.
 
 The cracked password is `factfinder`.
 
-![john](1.png)
+![john](images/1.png)
 
 ### Step 3: Reconstructing the ZIP Archive from the Hash
 
@@ -159,7 +159,6 @@ if __name__ == "__main__":
         sys.exit(1)
     create_the_one_true_zip(sys.argv[1], sys.argv[2])
 ```
-![Script Code](attachment.png)
 
 To use the script:
 1.  Save the script as `build_the_zip.py`.
@@ -178,7 +177,7 @@ unzip -P factfinder restored.zip
 ```
 This command prompts for the password, and upon entering `factfinder`, it successfully extracts `flag.txt`.
 
-![Unzip Command](2.png)
+![Unzip Command](images/2.png)
 
 Opening the `flag.txt` file reveals the flag.
 
