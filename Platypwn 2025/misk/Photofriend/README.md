@@ -55,7 +55,7 @@ The result looks like a messy collection of errors, but it is exactly what we ne
 *   And the last part, `EH0pm2Dwd}`, which we had seen earlier.
 
 Here I accidentally displayed the first flag when I wanted to execute another command
-![Cascade of errors revealing the full flag](images/3_1.png)
+![Cascade of errors revealing the full flag](images/3_2.png)
 #### Step 4: Assembling the First Flag
 
 We now have all the components extracted from the `/home/platypus/flag` file. By combining them, we get the first flag.
