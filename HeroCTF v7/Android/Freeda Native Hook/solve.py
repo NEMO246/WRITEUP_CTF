@@ -1,0 +1,53 @@
+def solve():
+    # 1. Data from the .rodata section of the libv3.so file (byte_848)
+    arr1 = [
+        0x17, 0x11, 0x05, 0xB3, 0xC1, 0x42, 0xD0, 0x1E, 0x38, 0x7C, 0x6B, 0x4E, 0x22, 0x75, 0x90, 0xA3, 
+        0x38, 0x0F, 0xCD, 0x84, 0xAC, 0xF2, 0x87, 0xAD, 0xC1, 0x78, 0xF9, 0x1D, 0x92, 0x6B, 0x99, 0x4F, 
+        0x81, 0xC1, 0x05, 0xB2, 0xF1, 0x6D, 0x69, 0x3A, 0xDB, 0xC3, 0xBE, 0x34, 0x0F, 0xC8, 0x61, 0x1F
+    ]
+    # 2. Data from the .rodata section (byte_878)
+    arr2 = [
+        0x31, 0xD9, 0x1F, 0x31, 0x89, 0x13, 0x39, 0xB2, 0x2D, 0xEB, 0xB6, 0xD7, 0xAF, 0x6D, 0x56, 0x92, 
+        0xAF, 0xFE, 0xF1, 0x75, 0x2B, 0x50, 0x8C, 0xDB, 0xEC, 0x92, 0x06, 0x4E, 0x74, 0xA9, 0xEE, 0x86, 
+        0x54, 0x88, 0x4E, 0x0F, 0xE0, 0x97, 0x6F, 0xCC, 0xC3, 0xAD, 0xEB, 0x41, 0xAC, 0x22, 0x37, 0x26
+    ]
+    
+    # 3. Key found in the code (0x5F9D7BC3)
+    key_bytes = [0xC3, 0x7B, 0x9D, 0x5F]
+
+    # Rotate right (ROR) function
+    def ror(val, r):
+        r = r % 8
+        return ((val >> r) | (val << (8 - r))) & 0xFF
+
+    print("[*] Decrypting the flag using the exact algorithm...")
+    flag = [""] * 48
+    
+    # Main loop for the 48 characters of the flag
+    for pos in range(48):
+        # 4. Permutation formula to select bytes (recovered from ASM)
+        idx = (29 * pos + 7) % 48
+        
+        # 5. Select bytes from the arrays using the "permuted" index
+        b1 = arr1[idx]
+        b2 = arr2[idx]
+        
+        # 6. The key is selected based on the current position in the flag
+        k = key_bytes[pos % 4]
+        
+        # 7. The core logic: ~(A ^ B ^ Key)
+        val = (~(b1 ^ b2 ^ k)) & 0xFF
+        
+        # 8. EXACT ROTATION FORMULA (recovered from ASM)
+        # In the assembly, this is complex math, but it simplifies to a basic formula:
+        rotate_amount = ((pos % 7) + 1) & 7
+        
+        # 9. Apply the rotation
+        decrypted_char = chr(ror(val, rotate_amount))
+        
+        flag[pos] = decrypted_char
+        
+    result = "".join(flag)
+    print(f"\nFLAG: {result}")
+
+solve()

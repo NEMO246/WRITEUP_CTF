@@ -1,0 +1,9 @@
+version: '3'
+services:
+  challenge:
+    build: ./app
+    ports:
+      - "1337:3000"
+    environment:
+      - FLAG=EPFL{TODO_add_flag}
+

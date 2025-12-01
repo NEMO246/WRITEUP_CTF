@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON CASINO 2077</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>NEON CASINO</h1>
+        
+        <div class="wallet">
+            <div class="balance-card">
+                <h3>Microcoins Balance</h3>
+                <p id="mc-balance">Loading...</p>
+                <small>(1 Coin = 1,000,000 Microcoins)</small>
+            </div>
+            <div class="balance-card">
+                <h3>USD Wallet</h3>
+                <p id="usd-balance">Loading...</p>
+                <div class="actions">
+                    <button onclick="fakeAction()">Deposit</button>
+                    <button onclick="fakeAction()">Withdraw</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-section section-card">
+            <h2>HIGH STAKES GAMBLE</h2>
+            <div class="controls">
+                <div style="margin-bottom: 15px;">
+                    <label>
+                        Amount:
+                        <input type="number" id="bet-amount" step="1" placeholder="1">
+                    </label>
+                    <label>
+                        Currency:
+                        <select id="bet-currency">
+                            <option value="coins">Microcoins (µC)</option>
+                            <option value="usd">USD ($)</option>
+                        </select>
+                    </label>
+                </div>
+                <button id="gamble-btn">LET'S GO GAMBLING!</button>
+            </div>
+            <p id="gamble-result"></p>
+        </div>
+
+        <div class="convert-section section-card">
+            <h2>CURRENCY EXCHANGE</h2>
+            <p style="color: #aaa; margin-bottom: 20px;">Convert Coins to USD. Rate: 1 Coin = $0.01 USD.</p>
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <input type="number" id="convert-amount" placeholder="Coins (Integer)" step="1">
+                <button id="convert-btn">CONVERT</button>
+            </div>
+            <p id="convert-msg"></p>
+        </div>
+
+        <div class="shop-section section-card">
+            <h2>BLACK MARKET</h2>
+            <button id="buy-flag-btn">Buy Flag ($10 USD)</button>
+            <p id="flag-display" style="margin-top: 20px; font-family: monospace; color: #0f0;"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
