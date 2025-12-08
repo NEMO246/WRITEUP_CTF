@@ -1,3 +1,3 @@
 Personal results BackdoorCTF 2025
 
-<img width="1120" height="802" alt="results" src="https://github.com/user-attachments/assets/3c46d018-033b-4966-a5fe-41c368b661a1" />
+<img width="940" height="865" alt="results" src="https://github.com/user-attachments/assets/00f594f4-dded-446d-b7bb-ea8d53e0e4dd" />
