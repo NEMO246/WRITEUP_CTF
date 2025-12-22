@@ -1,5 +1,5 @@
 
-# 0opsCTF 2025 - ProAgent Write-up
+# 0CTF 2025 - ProAgent Write-up
 
 ![Title](images/Title.png)
 
