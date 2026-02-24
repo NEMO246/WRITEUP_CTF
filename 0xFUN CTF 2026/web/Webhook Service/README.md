@@ -23,8 +23,6 @@ class FlagHandler(BaseHTTPRequestHandler):
 threading.Thread(target=lambda: HTTPServer(('127.0.0.1', 5001), FlagHandler).serve_forever(), daemon=True).start()
 ```
 
-![internal server code](images/1.png)
-
 The flag is served on `127.0.0.1:5001` via a **POST** request to `/flag`. Accessing this directly from the outside is impossible since it's bound to the loopback interface. This becomes our primary objective: forcing the application to make a request to itself.
 
 ### 2. Identifying the SSRF Vulnerability
