@@ -267,9 +267,6 @@ Running the script successfully decrypts the file.
 ## Step 5: Getting the Flag
 
 The decrypted file contains a long Base64 encoded string.
-```
-Vm14U1MwMUhTbkJpTVdGc1dsZG9WMWxVUm5KVmJGWnpWR3hhVjAxV1ZteGFXRUpoVmpGYVdGb3hTbWhsVm5CUVZteEtWMWx0ZEZkaVJtUnpXbGRvVmxkRlJsaFdWM1JMVm14V2ExSXhXbGRYYlhob1ZqRktjVkZ0Um1sWlZFNUVWVEphVDJOc1duSlRiR1JGVm14c1dGb3hTbWhsVm5CUVZteHdWMWxXWkZobFIwWkxXVmRTZVZkdFVuSlhiRXAwVjJ4YWMySkVUbGhoUjBaWFYxZDRjVlpzUW5KbFZsSlhWbTE0YVZkV1dtcGFWbWhhVmpGU2NWWnNjRmxVYlhaWFYxZDRWMkl4V2xWWGJYcFdZVEpHVjFZeFNraFdiR2hoVmxSS1YxWnNhR0ZXVjNSM1ZtMTQ=
-```
 
 We use **CyberChef** for decoding. Applying the **"From Base64"** operation 5 times in a row reveals the final flag.
 
